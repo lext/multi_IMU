@@ -170,7 +170,7 @@ class IMUMESUI(QtGui.QMainWindow):
         self.setCentralWidget(centralwidget)
               
     def stop_recording_slot(self):
-        print("Recording has been stopped...")
+        print("Recording has stopped...")
         
         self.pbStop.setEnabled(False)
         self.pbStart.setEnabled(True)
@@ -185,7 +185,7 @@ class IMUMESUI(QtGui.QMainWindow):
             if res == QtGui.QMessageBox.No:
                 return
             self.samples_measured = 0
-        print("Recording has been started...")
+        print("Recording has started...")
 
         self.pbStop.setEnabled(True)
         self.pbStart.setEnabled(False)
@@ -194,12 +194,22 @@ class IMUMESUI(QtGui.QMainWindow):
         self.thread.start(self.cbPorts.currentText(), self.connection_speed, self.timeout)
         
     def save_recording_slot(self):
-        print("Data have been saved...")
+        filename = QtGui.QFileDialog.getSaveFileName(self, 'Save signals', directory=".")
+        if not filename:
+            return
+        sigs_to_save = np.zeros((self.samples_measured, len(self.signals)))
+        sigs_to_save[:, 0] = (self.signals[0][:self.samples_measured]-self.signals[0][0])/1000.
+        for i in range(1, 12):
+            sigs_to_save[:, i] = self.signals[i+1][:self.samples_measured]
+
+        np.savetxt(filename, sigs_to_save, fmt="%.4f")
+        del sigs_to_save
+        print "Data has been saved"
         
     def update_plots_slot(self, data):
         shape = self.signals[0].shape[0]
         if self.samples_measured == shape:
-            print("Increasing arrays with the data")
+            print("Increasing buffers size")
             self.signals[0] = np.concatenate((self.signals[0], np.zeros(shape, dtype=np.int32)))
             for i in range(12):
                 self.signals[i+1] = np.concatenate((self.signals[i+1], np.zeros(shape, dtype=np.float16)))
