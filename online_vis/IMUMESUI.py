@@ -16,7 +16,7 @@ class IMUMESUI(QtGui.QMainWindow):
         # Initializing the list of ports
         ports_info = comports()
         for i in ports_info:
-            print i.device
+            self.cbPorts.addItem(i.device)
         
 
 
