@@ -204,7 +204,7 @@ class IMUMESUI(QtGui.QMainWindow):
 
         np.savetxt(filename, sigs_to_save, fmt="%.4f")
         del sigs_to_save
-        print "Data has been saved"
+        print("Data have been saved")
         
         
     def update_plots_slot(self, data):
