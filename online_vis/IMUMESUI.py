@@ -206,6 +206,7 @@ class IMUMESUI(QtGui.QMainWindow):
         del sigs_to_save
         print "Data has been saved"
         
+        
     def update_plots_slot(self, data):
         shape = self.signals[0].shape[0]
         if self.samples_measured == shape:
