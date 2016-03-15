@@ -4,6 +4,9 @@ import pyqtgraph as pg
 import os
 import serial
 from serial.tools.list_ports import comports
+from MeasurementThread import MeasurementThread
+
+
 pg.setConfigOption('background', 'w')
 pg.setConfigOptions(antialias=True)
 
@@ -17,9 +20,14 @@ class IMUMESUI(QtGui.QMainWindow):
         ports_info = comports()
         for item in ports_info:
             self.cbPorts.addItem(item.device)
+        # Making connections
         self.connect(self.pbStart, QtCore.SIGNAL('clicked()'), self.start_recording_slot)
         self.connect(self.pbStop, QtCore.SIGNAL('clicked()'), self.stop_recording_slot)
         self.connect(self.pbSave, QtCore.SIGNAL('clicked()'), self.save_recording_slot)
+        
+        self.thread = MeasurementThread()
+        self.thread.newData.connect(self.update_plots_slot)
+        
 
     def build_gui(self):
         self.setWindowTitle('Multi-IMU data measurement system')
@@ -129,7 +137,12 @@ class IMUMESUI(QtGui.QMainWindow):
         self.pbStart.setEnabled(False)
         self.pbSave.setEnabled(False)
         
+        self.thread.start()
+        
     def save_recording_slot(self):
         print "Data have been saved..."
+        
+    def update_plots_slot(self, data):
+        self.p1.plot(data)
         
 
