@@ -6,15 +6,10 @@ import sys
 
 ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=4)
 
-ser.write(b'B')
-ser.flush()
 
 print("Initializaing the measurement")
 
-def finish_session(signal, frame):
-    print("Session terminated")
-    ser.write(b'E') 
-    ser.flush()              
+def finish_session(signal, frame):         
     ser.close()
     sys.exit(0)
 

@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python3
 #
 import sys
 from PyQt4 import QtCore, QtGui
@@ -9,7 +9,7 @@ def main():
 	app.setApplicationName('Multi-IMU data measurement system')
 	form = IMUMESUI.IMUMESUI()
 	form.showMaximized()
-	app.exec_()
+	app.exec()
 
 if __name__ == "__main__":
 	sys.exit(main())
