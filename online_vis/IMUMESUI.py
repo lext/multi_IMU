@@ -15,20 +15,20 @@ class IMUMESUI(QtGui.QMainWindow):
         self.build_gui()
         # Initializing the list of ports
         ports_info = comports()
-        for i in ports_info:
-            self.cbPorts.addItem(i.device)
-        
-
+        for item in ports_info:
+            self.cbPorts.addItem(item.device)
+        self.connect(self.pbStart, QtCore.SIGNAL('clicked()'), self.start_recording_slot)
+        self.connect(self.pbStop, QtCore.SIGNAL('clicked()'), self.stop_recording_slot)
+        self.connect(self.pbSave, QtCore.SIGNAL('clicked()'), self.save_recording_slot)
 
     def build_gui(self):
         self.setWindowTitle('Multi-IMU data measurement system')
         centralwidget = QtGui.QWidget()
-        self.pbInit = QtGui.QPushButton("Initialize device")
         self.pbStart = QtGui.QPushButton("Start recording")
         self.pbStop = QtGui.QPushButton("Stop recording")
         self.pbSave = QtGui.QPushButton("Save results")
         
-        self.pbStart.setEnabled(False)
+        self.pbStart.setEnabled(True)
         self.pbStop.setEnabled(False)
         self.pbSave.setEnabled(False)
         self.labPorts =  QtGui.QLabel("Ports")
@@ -79,7 +79,6 @@ class IMUMESUI(QtGui.QMainWindow):
         self.l1 = QtGui.QHBoxLayout()
         self.layout.addLayout(self.l1)
         
-        self.l1.addWidget(self.pbInit)
         self.l1.addWidget(self.pbStart)
         self.l1.addWidget(self.pbStop)
         self.l1.addWidget(self.pbSave)
@@ -114,4 +113,23 @@ class IMUMESUI(QtGui.QMainWindow):
         self.setMinimumHeight(500)
         # Setting central widget
         self.setCentralWidget(centralwidget)
+              
+    def stop_recording_slot(self):
+        print "Recording has been stopped..."
+        
+        self.pbStop.setEnabled(False)
+        self.pbStart.setEnabled(True)
+        self.pbSave.setEnabled(True)
+
+        
+    def start_recording_slot(self):
+        print "Recording has been started..."
+        
+        self.pbStop.setEnabled(True)
+        self.pbStart.setEnabled(False)
+        self.pbSave.setEnabled(False)
+        
+    def save_recording_slot(self):
+        print "Data have been saved..."
+        
 
