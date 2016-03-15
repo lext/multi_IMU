@@ -4,7 +4,7 @@ import numpy as np
 import time
 import sys
 
-ser = serial.Serial('/dev/ttyUSB1', 115200, timeout=4)
+ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=4)
 
 ser.write(b'B')
 ser.flush()
