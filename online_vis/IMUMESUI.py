@@ -3,7 +3,7 @@ import numpy as np
 import pyqtgraph as pg
 import os
 import serial
-
+from serial.tools.list_ports import comports
 pg.setConfigOption('background', 'w')
 pg.setConfigOptions(antialias=True)
 
@@ -11,9 +11,12 @@ class IMUMESUI(QtGui.QMainWindow):
 
     def __init__(self):
         super(IMUMESUI, self).__init__()
-        
+        # Building GUI
         self.build_gui()
-        
+        # Initializing the list of ports
+        ports_info = comports()
+        for i in ports_info:
+            print i.device
         
 
 
