@@ -5,7 +5,7 @@ import os
 import serial
 from serial.tools.list_ports import comports
 from MeasurementThread import MeasurementThread
-
+from time import time
 
 pg.setConfigOption('background', 'w')
 pg.setConfigOptions(antialias=True)
@@ -32,7 +32,7 @@ class IMUMESUI(QtGui.QMainWindow):
         
         self.signals = []
         print('Memory pre-allocation...')
-        self.signals.append(np.zeros(200*10, dtype=np.int32))
+        self.signals.append(np.zeros(200*10, dtype=float))
         for i in range(12):
             self.signals.append(np.zeros(200*10, dtype=np.float16))
         self.samples_measured = 0
@@ -61,7 +61,7 @@ class IMUMESUI(QtGui.QMainWindow):
 
         self.p1.getAxis('left').setPen((0,0,0))
         self.p1.getAxis('bottom').setPen((0,0,0))
-        self.p1.getAxis('left').setLabel('Accelerometer +-2g', units='Volts')
+        self.p1.getAxis('left').setLabel('Accel')
 
 
         self.p2 = pg.PlotWidget()
@@ -71,7 +71,7 @@ class IMUMESUI(QtGui.QMainWindow):
 
         self.p2.getAxis('left').setPen((0,0,0))
         self.p2.getAxis('bottom').setPen((0,0,0))
-        self.p2.getAxis('left').setLabel('Gyroscope', units='V')
+        self.p2.getAxis('left').setLabel('Gyro')
 
         
         self.p3 = pg.PlotWidget()
@@ -81,7 +81,7 @@ class IMUMESUI(QtGui.QMainWindow):
         
         self.p3.getAxis('left').setPen((0,0,0))
         self.p3.getAxis('bottom').setPen((0,0,0))
-        self.p3.getAxis('left').setLabel('Accelerometer +-2g', units='Volts')
+        self.p3.getAxis('left').setLabel('Accel')
 
 
         self.p4 = pg.PlotWidget()
@@ -92,7 +92,7 @@ class IMUMESUI(QtGui.QMainWindow):
         
         self.p4.getAxis('left').setPen((0,0,0))
         self.p4.getAxis('bottom').setPen((0,0,0))
-        self.p4.getAxis('left').setLabel('Gyroscope angle', units='Degrees')
+        self.p4.getAxis('left').setLabel('Gyro')
         self.p4.getAxis('bottom').setLabel('Time [s]')
 
         # Data curves
@@ -176,7 +176,23 @@ class IMUMESUI(QtGui.QMainWindow):
         self.pbStart.setEnabled(True)
         self.pbSave.setEnabled(True)
         self.thread.stop()
+        start = 0
+        t = self.signals[0][start:self.samples_measured]-self.signals[0][0]
+        self.acc1x.setData(t, self.signals[1][start:self.samples_measured])
+        self.acc1y.setData(t, self.signals[2][start:self.samples_measured])
+        self.acc1z.setData(t, self.signals[3][start:self.samples_measured])
 
+        self.gyro1x.setData(t, self.signals[4][start:self.samples_measured])
+        self.gyro1y.setData(t, self.signals[5][start:self.samples_measured])
+        self.gyro1z.setData(t, self.signals[6][start:self.samples_measured])
+    
+        self.acc2x.setData(t, self.signals[7][start:self.samples_measured])
+        self.acc2y.setData(t, self.signals[8][start:self.samples_measured])
+        self.acc2z.setData(t, self.signals[9][start:self.samples_measured])
+
+        self.gyro2x.setData(t, self.signals[10][start:self.samples_measured])
+        self.gyro2y.setData(t, self.signals[11][start:self.samples_measured])
+        self.gyro2z.setData(t, self.signals[12][start:self.samples_measured])
         
     def start_recording_slot(self):
         if self.samples_measured > 0:
@@ -204,7 +220,9 @@ class IMUMESUI(QtGui.QMainWindow):
 
         np.savetxt(filename, sigs_to_save, fmt="%.4f")
         del sigs_to_save
+        self.samples_measured = 0
         print("Data have been saved")
+        
         
         
     def update_plots_slot(self, data):
@@ -215,15 +233,16 @@ class IMUMESUI(QtGui.QMainWindow):
             for i in range(12):
                 self.signals[i+1] = np.concatenate((self.signals[i+1], np.zeros(shape, dtype=np.float16)))
 
-        self.signals[0][self.samples_measured] = data[0]
+        self.signals[0][self.samples_measured] = time()
         for i in range(12):
-            self.signals[i+1][self.samples_measured] = data[1][i]
+            self.signals[i+1][self.samples_measured] = data[i]
+        
         self.samples_measured += 1
         if self.samples_measured % 25 == 0:
             start = self.samples_measured-400
             if start < 0:
                 start = 0
-            t = (self.signals[0][start:self.samples_measured]-self.signals[0][0])/1000.
+            t = (self.signals[0][start:self.samples_measured]-self.signals[0][0])
             self.acc1x.setData(t, self.signals[1][start:self.samples_measured])
             self.acc1y.setData(t, self.signals[2][start:self.samples_measured])
             self.acc1z.setData(t, self.signals[3][start:self.samples_measured])

@@ -29,8 +29,9 @@ class MeasurementThread(QtCore.QThread):
                             b = bytearray()
                             while len(b) != 4:
                                 b.append(self.ser.read(1)[0])
-                            timestamp = int.from_bytes(bytes(b), byteorder="little")
-                            self.newData.emit([timestamp, data])
+                            #timestamp = int.from_bytes(bytes(b), byteorder="little")
+                            #self.newData.emit([timestamp, data])
+                            self.newData.emit(data)
                             PS = ""
                             break
                         else:
