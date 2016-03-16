@@ -2,7 +2,7 @@
 #include <FIMU_ADXL345.h>
 #include <FIMU_ITG3200.h>
 #include <Wire.h>
-
+#include <SoftwareSerial.h>
 #include "CommunicationUtils.h"
 
 #define TCAADDR 0x70
@@ -13,8 +13,7 @@ extern "C" {
 
 float vals[12];
 unsigned long time;
-char flag;
-
+SoftwareSerial XBee(0, 1);
 
 FreeSixIMU my3IMU = FreeSixIMU();
 
@@ -31,6 +30,7 @@ void tcaselect(uint8_t i) {
 
 void setup() {
   Wire.begin();
+  XBee.begin(115200);
   Serial.begin(115200);
   tcaselect(2);
   delay(5);
@@ -50,7 +50,7 @@ void loop(){
     my3IMU.getValues(vals);
     tcaselect(3);
     my3IMU.getValues(&vals[6]);
-    Serial.print("PS"); // Package start
+    Serial.write("PS"); // Package start
     Serial.write((uint8_t* )vals, sizeof(vals)); // data
     time = millis(); // Time in milliseconds
     Serial.write((uint8_t* )&time, 4);
