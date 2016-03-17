@@ -176,6 +176,23 @@ class IMUMESUI(QtGui.QMainWindow):
         self.pbStart.setEnabled(True)
         self.pbSave.setEnabled(True)
         self.thread.stop()
+        start = 0
+        t = (self.signals[0][start:self.samples_measured]-self.signals[0][0])/1000.
+        self.acc1x.setData(t, self.signals[1][start:self.samples_measured])
+        self.acc1y.setData(t, self.signals[2][start:self.samples_measured])
+        self.acc1z.setData(t, self.signals[3][start:self.samples_measured])
+
+        self.gyro1x.setData(t, self.signals[4][start:self.samples_measured])
+        self.gyro1y.setData(t, self.signals[5][start:self.samples_measured])
+        self.gyro1z.setData(t, self.signals[6][start:self.samples_measured])
+    
+        self.acc2x.setData(t, self.signals[7][start:self.samples_measured])
+        self.acc2y.setData(t, self.signals[8][start:self.samples_measured])
+        self.acc2z.setData(t, self.signals[9][start:self.samples_measured])
+
+        self.gyro2x.setData(t, self.signals[10][start:self.samples_measured])
+        self.gyro2y.setData(t, self.signals[11][start:self.samples_measured])
+        self.gyro2z.setData(t, self.signals[12][start:self.samples_measured])
 
         
     def start_recording_slot(self):
