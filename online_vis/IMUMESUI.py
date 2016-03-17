@@ -5,7 +5,7 @@ import os
 import serial
 from serial.tools.list_ports import comports
 from MeasurementThread import MeasurementThread
-
+from time import time
 
 pg.setConfigOption('background', 'w')
 pg.setConfigOptions(antialias=True)
@@ -32,7 +32,7 @@ class IMUMESUI(QtGui.QMainWindow):
         
         self.signals = []
         print('Memory pre-allocation...')
-        self.signals.append(np.zeros(200*10, dtype=np.int32))
+        self.signals.append(np.zeros(200*10, dtype=float))
         for i in range(12):
             self.signals.append(np.zeros(200*10, dtype=np.float16))
         self.samples_measured = 0
@@ -61,7 +61,7 @@ class IMUMESUI(QtGui.QMainWindow):
 
         self.p1.getAxis('left').setPen((0,0,0))
         self.p1.getAxis('bottom').setPen((0,0,0))
-        self.p1.getAxis('left').setLabel('Accelerometer +-2g', units='Volts')
+        self.p1.getAxis('left').setLabel('Accel')
 
 
         self.p2 = pg.PlotWidget()
@@ -71,7 +71,7 @@ class IMUMESUI(QtGui.QMainWindow):
 
         self.p2.getAxis('left').setPen((0,0,0))
         self.p2.getAxis('bottom').setPen((0,0,0))
-        self.p2.getAxis('left').setLabel('Gyroscope', units='V')
+        self.p2.getAxis('left').setLabel('Gyro')
 
         
         self.p3 = pg.PlotWidget()
@@ -81,7 +81,7 @@ class IMUMESUI(QtGui.QMainWindow):
         
         self.p3.getAxis('left').setPen((0,0,0))
         self.p3.getAxis('bottom').setPen((0,0,0))
-        self.p3.getAxis('left').setLabel('Accelerometer +-2g', units='Volts')
+        self.p3.getAxis('left').setLabel('Accel')
 
 
         self.p4 = pg.PlotWidget()
@@ -92,7 +92,7 @@ class IMUMESUI(QtGui.QMainWindow):
         
         self.p4.getAxis('left').setPen((0,0,0))
         self.p4.getAxis('bottom').setPen((0,0,0))
-        self.p4.getAxis('left').setLabel('Gyroscope angle', units='Degrees')
+        self.p4.getAxis('left').setLabel('Gyro')
         self.p4.getAxis('bottom').setLabel('Time [s]')
 
         # Data curves
@@ -193,7 +193,6 @@ class IMUMESUI(QtGui.QMainWindow):
         self.gyro2x.setData(t, self.signals[10][start:self.samples_measured])
         self.gyro2y.setData(t, self.signals[11][start:self.samples_measured])
         self.gyro2z.setData(t, self.signals[12][start:self.samples_measured])
-
         
     def start_recording_slot(self):
         if self.samples_measured > 0:
@@ -221,7 +220,9 @@ class IMUMESUI(QtGui.QMainWindow):
 
         np.savetxt(filename, sigs_to_save, fmt="%.4f")
         del sigs_to_save
+        self.samples_measured = 0
         print("Data have been saved")
+        
         
         
     def update_plots_slot(self, data):
@@ -256,7 +257,3 @@ class IMUMESUI(QtGui.QMainWindow):
             self.gyro2x.setData(t, self.signals[10][start:self.samples_measured])
             self.gyro2y.setData(t, self.signals[11][start:self.samples_measured])
             self.gyro2z.setData(t, self.signals[12][start:self.samples_measured])
-        
-        
-        
-
