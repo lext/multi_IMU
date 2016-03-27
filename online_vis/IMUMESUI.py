@@ -53,7 +53,7 @@ class IMUMESUI(QtGui.QMainWindow):
         self.labPorts =  QtGui.QLabel("Ports")
         self.cbPorts = QtGui.QComboBox();
         
-        # Plot widget
+        # Plot widgets
         self.p1 = pg.PlotWidget()
         self.p1.setMouseEnabled(x=True, y=False)
         self.p1.showGrid(x=True, y=True)
@@ -95,6 +95,10 @@ class IMUMESUI(QtGui.QMainWindow):
         self.p4.getAxis('left').setLabel('Gyro')
         self.p4.getAxis('bottom').setLabel('Time [s]')
 
+        self.p1.setRange(yRange=[-512.05, 512.05])
+        self.p2.setRange(yRange=[-1024.05, 1024.05])
+        self.p3.setRange(yRange=[-512.05, 512.05])
+        self.p4.setRange(yRange=[-1024.05, 1024.05])
         # Data curves
         self.acc1x = pg.PlotCurveItem(pen="r")
         self.acc1y = pg.PlotCurveItem(pen="g")
@@ -193,6 +197,29 @@ class IMUMESUI(QtGui.QMainWindow):
         self.gyro2x.setData(t, self.signals[10][start:self.samples_measured])
         self.gyro2y.setData(t, self.signals[11][start:self.samples_measured])
         self.gyro2z.setData(t, self.signals[12][start:self.samples_measured])
+
+        self.acc1x.setPos(t[0], 0)
+        self.acc1y.setPos(t[0], 0)
+        self.acc1z.setPos(t[0], 0)
+
+        self.gyro1x.setPos(t[0], 0)
+        self.gyro1y.setPos(t[0], 0)
+        self.gyro1z.setPos(t[0], 0)
+
+        self.acc2x.setPos(t[0], 0)
+        self.acc2y.setPos(t[0], 0)
+        self.acc2z.setPos(t[0], 0)
+
+        self.gyro2x.setPos(t[0], 0)
+        self.gyro2y.setPos(t[0], 0)
+        self.gyro2z.setPos(t[0], 0)
+
+
+        self.samples_measured = 0
+        self.p1.setLimits(xMin=t[0]-0.05, xMax=t[-1]+0.05)
+        self.p2.setLimits(xMin=t[0]-0.05, xMax=t[-1]+0.05)
+        self.p3.setLimits(xMin=t[0]-0.05, xMax=t[-1]+0.05)
+        self.p4.setLimits(xMin=t[0]-0.05, xMax=t[-1]+0.05)
         
     def start_recording_slot(self):
         if self.samples_measured > 0:
@@ -208,6 +235,10 @@ class IMUMESUI(QtGui.QMainWindow):
         self.pbSave.setEnabled(False)
         
         self.thread.start(self.cbPorts.currentText(), self.connection_speed, self.timeout)
+        self.p1.setLimits(xMin=-4.05, xMax=0.05)
+        self.p2.setLimits(xMin=-4.05, xMax=0.05)
+        self.p3.setLimits(xMin=-4.05, xMax=0.05)
+        self.p4.setLimits(xMin=-4.05, xMax=0.05)
         
     def save_recording_slot(self):
         filename = QtGui.QFileDialog.getSaveFileName(self, 'Save signals', directory=".")
@@ -220,12 +251,15 @@ class IMUMESUI(QtGui.QMainWindow):
 
         np.savetxt(filename, sigs_to_save, fmt="%.4f")
         del sigs_to_save
-        self.samples_measured = 0
         print("Data have been saved")
+
         
         
         
     def update_plots_slot(self, data):
+        if np.any(np.isinf(data[1]) | np.isnan(data[1])) or ((data[0] - self.signals[0][self.samples_measured-1]) < 0):
+            print(data[0], self.signals[0][self.samples_measured-1])
+            return
         shape = self.signals[0].shape[0]
         if self.samples_measured == shape:
             print("Increasing buffers size")
@@ -236,9 +270,10 @@ class IMUMESUI(QtGui.QMainWindow):
         self.signals[0][self.samples_measured] = data[0]
         for i in range(12):
             self.signals[i+1][self.samples_measured] = data[1][i]
+
         self.samples_measured += 1
         if self.samples_measured % 25 == 0:
-            start = self.samples_measured-400
+            start = self.samples_measured-600
             if start < 0:
                 start = 0
             t = (self.signals[0][start:self.samples_measured]-self.signals[0][0])/1000.
@@ -249,7 +284,7 @@ class IMUMESUI(QtGui.QMainWindow):
             self.gyro1x.setData(t, self.signals[4][start:self.samples_measured])
             self.gyro1y.setData(t, self.signals[5][start:self.samples_measured])
             self.gyro1z.setData(t, self.signals[6][start:self.samples_measured])
-        
+
             self.acc2x.setData(t, self.signals[7][start:self.samples_measured])
             self.acc2y.setData(t, self.signals[8][start:self.samples_measured])
             self.acc2z.setData(t, self.signals[9][start:self.samples_measured])
@@ -257,3 +292,19 @@ class IMUMESUI(QtGui.QMainWindow):
             self.gyro2x.setData(t, self.signals[10][start:self.samples_measured])
             self.gyro2y.setData(t, self.signals[11][start:self.samples_measured])
             self.gyro2z.setData(t, self.signals[12][start:self.samples_measured])
+            
+            self.acc1x.setPos(-(t[-1]), 0)
+            self.acc1y.setPos(-(t[-1]), 0)
+            self.acc1z.setPos(-(t[-1]), 0)
+
+            self.gyro1x.setPos(-(t[-1]), 0)
+            self.gyro1y.setPos(-(t[-1]), 0)
+            self.gyro1z.setPos(-(t[-1]), 0)
+
+            self.acc2x.setPos(-(t[-1]), 0)
+            self.acc2y.setPos(-(t[-1]), 0)
+            self.acc2z.setPos(-(t[-1]), 0)
+
+            self.gyro2x.setPos(-(t[-1]), 0)
+            self.gyro2y.setPos(-(t[-1]), 0)
+            self.gyro2z.setPos(-(t[-1]), 0)

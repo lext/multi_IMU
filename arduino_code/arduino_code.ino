@@ -16,6 +16,7 @@ unsigned long time;
 char flag;
 
 
+
 FreeSixIMU my3IMU = FreeSixIMU();
 
 
@@ -41,20 +42,20 @@ void setup() {
   delay(5);
   my3IMU.init(true);
   delay(5);
+  
 }
 
 
 
 void loop(){
-    tcaselect(2);
-    my3IMU.getValues(vals);
-    tcaselect(3);
-    my3IMU.getValues(&vals[6]);
-    Serial.print("PS"); // Package start
-    Serial.write((uint8_t* )vals, sizeof(vals)); // data
-    time = millis(); // Time in milliseconds
-    Serial.write((uint8_t* )&time, 4);
-    Serial.flush();
-
+        tcaselect(2);
+        my3IMU.getValues(vals);
+        tcaselect(3);
+        my3IMU.getValues(&vals[6]);
+        Serial.print("PS"); // Package start
+        Serial.write((uint8_t* )vals, sizeof(vals)); // data
+        time = millis(); // Time in milliseconds
+        Serial.write((uint8_t* )&time, 4);
+        Serial.flush();
 }
 
