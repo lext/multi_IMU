@@ -6,7 +6,8 @@ import serial
 class MeasurementThread(QtCore.QThread):
     newData = QtCore.Signal(object)
     measure = False
-
+    start_time = None
+    
     def start(self, port, speed, timeout):
         self.measure = True
         self.ser = serial.Serial(port, speed, timeout=timeout)
@@ -30,7 +31,12 @@ class MeasurementThread(QtCore.QThread):
                             while len(b) != 4:
                                 b.append(self.ser.read(1)[0])
                             timestamp = int.from_bytes(bytes(b), byteorder="little")
-                            self.newData.emit([timestamp, data])
+                            timestamp = timestamp & 0xffffffff
+                            if self.start_time is None:
+                                self.start_time = timestamp
+                              
+                                
+                            self.newData.emit([timestamp-self.start_time, data])
                             #self.newData.emit(data)
                             PS = ""
                             break
@@ -43,5 +49,6 @@ class MeasurementThread(QtCore.QThread):
 
     def stop(self):
         self.measure = False
+        self.start_time = None
 
 

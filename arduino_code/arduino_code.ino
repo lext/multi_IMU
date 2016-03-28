@@ -11,8 +11,13 @@ extern "C" {
 #include "utility/twi.h"  // from Wire library, so we can do bus scanning
 }
 
+extern volatile unsigned long timer0_millis;
+
 float vals[12];
-unsigned long time;
+uint32_t time;
+uint32_t time_send;
+static uint32_t lWaitMillis;
+
 char flag;
 
 
@@ -30,7 +35,12 @@ void tcaselect(uint8_t i) {
 }
 
 
+
 void setup() {
+  noInterrupts ();
+  timer0_millis = 0;
+  interrupts ();
+  
   Wire.begin();
   Serial.begin(115200);
   tcaselect(2);
@@ -43,19 +53,27 @@ void setup() {
   my3IMU.init(true);
   delay(5);
   
+  lWaitMillis = millis()+6;
+  time_send = 0;
+  
 }
 
 
 
 void loop(){
-        tcaselect(2);
-        my3IMU.getValues(vals);
-        tcaselect(3);
-        my3IMU.getValues(&vals[6]);
-        Serial.print("PS"); // Package start
-        Serial.write((uint8_t* )vals, sizeof(vals)); // data
-        time = millis(); // Time in milliseconds
-        Serial.write((uint8_t* )&time, 4);
-        Serial.flush();
+  time = millis();
+  if( (long)(millis() - lWaitMillis ) >= 0) {
+    tcaselect(2);
+    my3IMU.getValues(vals);
+    tcaselect(3);
+    my3IMU.getValues(&vals[6]);
+    Serial.print("PS");
+    Serial.write((uint8_t* )vals, sizeof(vals));
+    Serial.write((uint8_t* )&time, sizeof(time));
+    Serial.flush();
+    lWaitMillis+=6;
+    time_send+=abs((long)(time - lWaitMillis));
+
+  }
 }
 

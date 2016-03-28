@@ -6,6 +6,7 @@ import serial
 from serial.tools.list_ports import comports
 from MeasurementThread import MeasurementThread
 from time import time
+from datetime import timedelta
 
 pg.setConfigOption('background', 'w')
 pg.setConfigOptions(antialias=True)
@@ -18,14 +19,6 @@ class IMUMESUI(QtGui.QMainWindow):
         super(IMUMESUI, self).__init__()
         # Building GUI
         self.build_gui()
-        # Initializing the list of ports
-        ports_info = comports()
-        for item in reversed(ports_info):
-            self.cbPorts.addItem(item.device)
-        # Making connections
-        self.connect(self.pbStart, QtCore.SIGNAL('clicked()'), self.start_recording_slot)
-        self.connect(self.pbStop, QtCore.SIGNAL('clicked()'), self.stop_recording_slot)
-        self.connect(self.pbSave, QtCore.SIGNAL('clicked()'), self.save_recording_slot)
         
         self.thread = MeasurementThread()
         self.thread.newData.connect(self.update_plots_slot)
@@ -96,9 +89,9 @@ class IMUMESUI(QtGui.QMainWindow):
         self.p4.getAxis('bottom').setLabel('Time [s]')
 
         self.p1.setRange(yRange=[-512.05, 512.05])
-        self.p2.setRange(yRange=[-1024.05, 1024.05])
+        self.p2.setRange(yRange=[-1100.05, 1100.05])
         self.p3.setRange(yRange=[-512.05, 512.05])
-        self.p4.setRange(yRange=[-1024.05, 1024.05])
+        self.p4.setRange(yRange=[-1100.05, 1100.05])
         # Data curves
         self.acc1x = pg.PlotCurveItem(pen="r")
         self.acc1y = pg.PlotCurveItem(pen="g")
@@ -165,13 +158,31 @@ class IMUMESUI(QtGui.QMainWindow):
         
         self.l3.addWidget(self.p3)
         self.l3.addWidget(self.p4)
-
-
+        
+        
 
         self.setMinimumWidth(800)
         self.setMinimumHeight(500)
         # Setting central widget
         self.setCentralWidget(centralwidget)
+        
+        # Initializing the list of ports
+        self.sbStatus = QtGui.QStatusBar(self)
+        self.setStatusBar(self.sbStatus)
+        
+        ports_info = comports()
+
+        for item in reversed(ports_info):
+            self.cbPorts.addItem(item.device)
+        if len(ports_info) > 0:    
+            self.sbStatus.showMessage("Ready")
+        else:
+            self.sbStatus.showMessage("No ports available!")
+            
+        # Making connections
+        self.connect(self.pbStart, QtCore.SIGNAL('clicked()'), self.start_recording_slot)
+        self.connect(self.pbStop, QtCore.SIGNAL('clicked()'), self.stop_recording_slot)
+        self.connect(self.pbSave, QtCore.SIGNAL('clicked()'), self.save_recording_slot)
               
     def stop_recording_slot(self):
         print("Recording has stopped...")
@@ -220,6 +231,7 @@ class IMUMESUI(QtGui.QMainWindow):
         self.p2.setLimits(xMin=t[0]-0.05, xMax=t[-1]+0.05)
         self.p3.setLimits(xMin=t[0]-0.05, xMax=t[-1]+0.05)
         self.p4.setLimits(xMin=t[0]-0.05, xMax=t[-1]+0.05)
+        self.sbStatus.showMessage("Stopped. Unsaved data!")
         
     def start_recording_slot(self):
         if self.samples_measured > 0:
@@ -251,6 +263,7 @@ class IMUMESUI(QtGui.QMainWindow):
 
         np.savetxt(filename, sigs_to_save, fmt="%.4f")
         del sigs_to_save
+        self.sbStatus.showMessage("Stopped. Data saved")
         print("Data have been saved")
 
         
@@ -258,7 +271,8 @@ class IMUMESUI(QtGui.QMainWindow):
         
     def update_plots_slot(self, data):
         if np.any(np.isinf(data[1]) | np.isnan(data[1])) or ((data[0] - self.signals[0][self.samples_measured-1]) < 0):
-            print(data[0], self.signals[0][self.samples_measured-1])
+            print(data[0], self.signals[0][self.samples_measured-1], data[1])
+            self.samples_measured -= 1
             return
         shape = self.signals[0].shape[0]
         if self.samples_measured == shape:
@@ -308,3 +322,6 @@ class IMUMESUI(QtGui.QMainWindow):
             self.gyro2x.setPos(-(t[-1]), 0)
             self.gyro2y.setPos(-(t[-1]), 0)
             self.gyro2z.setPos(-(t[-1]), 0)
+            
+            self.sbStatus.showMessage("Recording. Elapsed time: "+\
+            str(timedelta(seconds=self.signals[0][self.samples_measured-1]//1000.)))
