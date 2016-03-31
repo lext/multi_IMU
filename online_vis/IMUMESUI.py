@@ -225,8 +225,6 @@ class IMUMESUI(QtGui.QMainWindow):
         self.gyro2y.setPos(t[0], 0)
         self.gyro2z.setPos(t[0], 0)
 
-
-        self.samples_measured = 0
         self.p1.setLimits(xMin=t[0]-0.05, xMax=t[-1]+0.05)
         self.p2.setLimits(xMin=t[0]-0.05, xMax=t[-1]+0.05)
         self.p3.setLimits(xMin=t[0]-0.05, xMax=t[-1]+0.05)

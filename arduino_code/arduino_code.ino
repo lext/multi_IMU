@@ -85,9 +85,5 @@ void loop(){
     
     Serial.write(message, sizeof(message));
     Serial.flush();
-    
-    // Reinitializing array of IMUs values
-    for(int i=0; i < 12; i++)
-      vals[i] = -30000;
 }
 
