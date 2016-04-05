@@ -66,7 +66,7 @@ void setup() {
   my3IMU.init(true);
   delay(5);
   
-  lWaitMillis = millis()+4;
+  lWaitMillis = millis()+6;
   time_send = 0;
   
 }
@@ -81,20 +81,22 @@ void loop(){
       my3IMU.getValues(vals);
       tcaselect(3);
       my3IMU.getValues(&vals[6]);
-      lWaitMillis+=4;
+      lWaitMillis+=6;
+          // Starting the message 
+      message[0] = 'B';
+      message[1] = 'E';
+      // Copying time
+      memcpy(&message[2], (uint8_t* )&time, sizeof(time));
+      // Copying data measured from IMUs
+      memcpy(&message[2+sizeof(time)], (uint8_t* )vals, sizeof(vals));
+      // Ending the message
+      message[2+sizeof(time)+sizeof(vals)] = 'E';
+      message[2+sizeof(time)+sizeof(vals)+1] = 'N';
+      
+      Serial.write(message, sizeof(message));
+      Serial.flush();
+      
     }
-    // Starting the message 
-    message[0] = 'B';
-    message[1] = 'E';
-    // Copying time
-    memcpy(&message[2], (uint8_t* )&time, sizeof(time));
-    // Copying data measured from IMUs
-    memcpy(&message[2+sizeof(time)], (uint8_t* )vals, sizeof(vals));
-    // Ending the message
-    message[2+sizeof(time)+sizeof(vals)] = 'E';
-    message[2+sizeof(time)+sizeof(vals)+1] = 'N';
-    
-    Serial.write(message, sizeof(message));
-    Serial.flush();
+
 }
 
