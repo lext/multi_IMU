@@ -1,5 +1,16 @@
 #! /usr/bin/env python3
 #
+
+"""
+multi_IMU software main file.
+
+(c) Aleksei Tiulpin, 2016
+
+Center for Machine Vision and Signal Analysis,
+University of Oulu, Finland
+
+"""
+
 import sys
 from PyQt4 import QtCore, QtGui
 import IMUMESUI

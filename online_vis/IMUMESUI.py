@@ -1,3 +1,13 @@
+"""
+multi_IMU software main window class.
+
+(c) Aleksei Tiulpin, 2016
+
+Center for Machine Vision and Signal Analysis,
+University of Oulu, Finland
+
+"""
+
 from pyqtgraph.Qt import QtGui, QtCore
 import numpy as np
 import pyqtgraph as pg

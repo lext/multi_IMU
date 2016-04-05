@@ -1,3 +1,14 @@
+"""
+multi_IMU software measurement thread class.
+
+(c) Aleksei Tiulpin, 2016
+
+Center for Machine Vision and Signal Analysis,
+University of Oulu, Finland
+
+"""
+
+
 import numpy as np
 from pyqtgraph.Qt import QtGui, QtCore
 import time

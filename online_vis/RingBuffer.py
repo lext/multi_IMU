@@ -1,5 +1,10 @@
 """
-Implementation of a ring byte buffer
+Implementation of byte ring buffer
+
+(c) Aleksei Tiulpin, 2016
+
+Center for Machine Vision and Signal Analysis,
+University of Oulu, Finland
 
 """
 

@@ -1,3 +1,13 @@
+"""
+Visualizer of the data acquired from multi_IMU software.
+
+(c) Aleksei Tiulpin, 2016
+
+Center for Machine Vision and Signal Analysis,
+University of Oulu, Finland
+
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
