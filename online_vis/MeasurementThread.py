@@ -29,15 +29,14 @@ class MeasurementThread(QtCore.QThread):
         rb = RingBuffer(56)
         
         while self.measure:
-            if self.ser.in_waiting > 0:
-                rb.append(self.ser.read(1)[0])
-                if rb[0] == ord("B") and rb[1] == ord("E") and rb[54] == ord("E") and rb[55] == ord("N"):
-                    timestamp = int.from_bytes(bytes(rb[2:6]), byteorder="little")
-                    timestamp = timestamp & 0xffffffff
-                    data = np.fromstring(bytes(rb[6:54]), dtype="<f")
-                    if self.start_time is None:
-                        self.start_time = timestamp
-                    self.newData.emit([timestamp-self.start_time, data])
+            rb.append(self.ser.read(1)[0])
+            if rb[0] == ord("B") and rb[1] == ord("E") and rb[54] == ord("E") and rb[55] == ord("N"):
+                timestamp = int.from_bytes(bytes(rb[2:6]), byteorder="little")
+                timestamp = timestamp & 0xffffffff
+                data = np.fromstring(bytes(rb[6:54]), dtype="<f")
+                if self.start_time is None:
+                    self.start_time = timestamp
+                self.newData.emit([timestamp-self.start_time, data])
                 
         self.ser.close()
 

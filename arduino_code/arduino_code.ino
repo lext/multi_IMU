@@ -13,7 +13,7 @@ University of Oulu, Finland
 #include <FIMU_ADXL345.h>
 #include <FIMU_ITG3200.h>
 #include <Wire.h>
-
+#include <SoftwareSerial.h>
 #include "CommunicationUtils.h"
 
 #define TCAADDR 0x70
@@ -35,7 +35,7 @@ char flag;
 
 
 FreeSixIMU my3IMU = FreeSixIMU();
-
+SoftwareSerial XBee(0, 1);
 
 void tcaselect(uint8_t i) {
   if (i > 7) 
@@ -55,7 +55,8 @@ void setup() {
   interrupts ();
   
   Wire.begin();
-  Serial.begin(115200);
+  //Serial.begin(115200);
+  XBee.begin(115200);
   tcaselect(2);
   delay(5);
   my3IMU.init(true);
@@ -93,8 +94,10 @@ void loop(){
       message[2+sizeof(time)+sizeof(vals)] = 'E';
       message[2+sizeof(time)+sizeof(vals)+1] = 'N';
       
-      Serial.write(message, sizeof(message));
-      Serial.flush();
+      //Serial.write(message, sizeof(message));
+      //Serial.flush();
+      XBee.write(message, sizeof(message));
+      XBee.flush();
       
     }
 
