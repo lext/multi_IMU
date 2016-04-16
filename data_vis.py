@@ -36,25 +36,26 @@ if __name__ == "__main__":
 
     plt.figure()
     plt.title("Acc 1")
+    c = ["r","g","b"]
     for i in range(3):
-	    plt.plot(t, acc1[:, i])
+	    plt.plot(t, acc1[:, i], c=c[i])
 
 
     plt.figure()
     plt.title("Gyro 1")
     for i in range(3):
-	    plt.plot(t, gyro1[:, i])
+	    plt.plot(t, gyro1[:, i], c=c[i])
 
 
     plt.figure()
     plt.title("Acc 2")
     for i in range(3):
-	    plt.plot(t, acc2[:, i])
+	    plt.plot(t, acc2[:, i], c=c[i])
 
 
     plt.figure()
     plt.title("Gyro 2")
     for i in range(3):
-	    plt.plot(t, gyro2[:, i])
-
+	    plt.plot(t, gyro2[:, i], c=c[i])
+    print "tes"
     plt.show()

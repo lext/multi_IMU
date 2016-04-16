@@ -266,8 +266,8 @@ class IMUMESUI(QtGui.QMainWindow):
             return
         sigs_to_save = np.zeros((self.samples_measured, len(self.signals)))
         sigs_to_save[:, 0] = (self.signals[0][:self.samples_measured]-self.signals[0][0])/1000.
-        for i in range(1, 12):
-            sigs_to_save[:, i] = self.signals[i+1][:self.samples_measured]
+        for i in range(1, len(self.signals)):
+            sigs_to_save[:, i] = self.signals[i][:self.samples_measured]
 
         np.savetxt(filename, sigs_to_save, fmt="%.4f")
         del sigs_to_save
